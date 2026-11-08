@@ -3,181 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>استعلام اشتراك FTTH - المشروع الوطني</title>
+    <title>لوحة إرسال التنبيهات الآلية - واتساب</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-100 text-gray-900 font-sans min-h-screen">
 
-    <!-- Header -->
-    <header class="bg-[#0A2540] text-white p-4 shadow-md text-center">
-        <h1 class="text-xl font-bold">بوابة الاستعلام عن اشتراك FTTH</h1>
-        <p class="text-xs text-cyan-400 mt-1">المنظومة الوطنية للإنترنت</p>
+    <header class="bg-[#0A2540] text-white p-4 text-center shadow">
+        <h1 class="text-lg font-bold">نظام تنبيهات الاشتراكات الآلي (واتساب)</h1>
+        <p class="text-xs text-emerald-400 mt-1">إرسال في الخلفية • حماية ضد الحظر</p>
     </header>
 
-    <main class="max-w-xl mx-auto p-4 space-y-4">
+    <main class="max-w-4xl mx-auto p-4 space-y-6">
         
-        <!-- Section 1: Auto Network Detector (التعرف التلقائي) -->
-        <div id="autoDetectCard" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-            <div class="flex items-center justify-between border-b pb-3 mb-4">
-                <span class="text-sm font-bold text-gray-700 flex items-center gap-2">
-                    <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                    الاشتراك الحالي للشبكة
-                </span>
-                <span class="text-xs text-gray-400">فحص تلقائي</span>
-            </div>
-            
-            <div id="autoDetectLoader" class="text-center py-4">
-                <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-[#00D4B2] border-t-transparent"></div>
-                <p class="text-xs text-gray-500 mt-2">جاري التعرف على اشتراك خطك الحالي...</p>
-            </div>
-
-            <div id="autoDetectResult" class="hidden space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">اسم المشترك:</span>
-                    <span id="autoName" class="font-bold text-gray-800">-</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">اسم الحساب (User):</span>
-                    <span id="autoUser" class="font-semibold text-blue-600">-</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">حالة الاشتراك:</span>
-                    <span id="autoStatus" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">-</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">تاريخ الانتهاء:</span>
-                    <span id="autoExpire" class="text-sm font-medium text-gray-700">-</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 2: Search Trigger Button & Modal Form -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 text-center">
-            <h2 class="text-sm font-semibold text-gray-600 mb-3">هل ترغب بالاستعلام عن اشتراك آخر؟</h2>
-            <button onclick="toggleSearchBox()" class="w-full bg-[#0A2540] hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
-                <svg class="w-5 h-5 text-[#00D4B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                الاستعلام عن اشتراك آخر
+        <!-- Tab Switcher -->
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="switchTab('today')" id="tabToday" class="bg-red-600 text-white font-bold py-3 rounded-xl shadow transition text-center">
+                🚨 تنتهي اليوم (<span id="countToday">0</span>)
+            </button>
+            <button onclick="switchTab('week')" id="tabWeek" class="bg-amber-500 text-white font-bold py-3 rounded-xl shadow transition text-center">
+                ⚠️ تنتهي خلال أسبوع (<span id="countWeek">0</span>)
             </button>
         </div>
 
-        <!-- Search Inputs (Hidden by default) -->
-        <div id="searchBox" class="hidden bg-white p-5 rounded-2xl shadow-md border border-cyan-100 space-y-4">
-            <h3 class="font-bold text-gray-800 text-sm">بحث بدلالة الاسم أو رقم الهاتف</h3>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-500 mb-1 block">ادخل اسم المشترك أو رقم الهاتف:</label>
-                    <input type="text" id="searchInput" placeholder="مثال: محمد علي أو 0770..." class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:border-[#00D4B2]">
-                </div>
-                <button onclick="searchSubscriber()" class="w-full bg-[#00D4B2] hover:bg-teal-400 text-[#0A2540] font-bold py-2.5 rounded-xl transition">
-                    بحث الآن
-                </button>
+        <!-- Container List -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden p-4">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 id="listTitle" class="font-bold text-gray-700 text-sm">المشتركين الذين تنتهي اشتراكاتهم اليوم</h2>
+                <button onclick="loadData()" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium">تحديث القائمة 🔄</button>
             </div>
 
-            <!-- Search Results Area -->
-            <div id="searchResults" class="space-y-2 pt-3 border-t hidden">
-                <!-- Data will populate here -->
+            <div id="subscribersContainer" class="space-y-3">
+                <!-- Data injected here -->
             </div>
         </div>
 
     </main>
 
     <script>
-        const token = localStorage.getItem('access_token') || 'YOUR_ACCESS_TOKEN';
+        let currentTab = 'today';
+        let globalData = { today: [], week: [] };
 
-        // 1. التعرف التلقائي على المشترك من خلال الشبكة المتصل عليها
-        async function detectCurrentSubscriber() {
-            const loader = document.getElementById('autoDetectLoader');
-            const resultBox = document.getElementById('autoDetectResult');
-
+        async function loadData() {
             try {
-                // استعلام المسار المباشر للتعرف على الحساب المتصل تلقائياً
-                const res = await fetch('https://admin.ftth.iq/api/subscriptions/my-subscription', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Origin': 'https://admin.ftth.iq',
-                        'Referer': 'https://admin.ftth.iq/'
-                    }
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    document.getElementById('autoName').textContent = data.fullName || 'مشترك ناشط';
-                    document.getElementById('autoUser').textContent = data.username || 'N/A';
-                    document.getElementById('autoStatus').textContent = data.status || 'فعال';
-                    document.getElementById('autoExpire').textContent = data.expireDate ? data.expireDate.split('T')[0] : 'غير محدد';
-                    
-                    loader.classList.add('hidden');
-                    resultBox.classList.remove('hidden');
-                } else {
-                    throw new Error('لم يتم التعرف التلقائي');
-                }
+                const res = await fetch('http://localhost:3000/api/subscribers-status');
+                globalData = await res.json();
+                
+                document.getElementById('countToday').textContent = globalData.today.length;
+                document.getElementById('countWeek').textContent = globalData.week.length;
+                renderList();
             } catch (err) {
-                loader.innerHTML = '<p class="text-xs text-amber-600">تعذر التوصل لاشتراك الشبكة الحالي تلقائياً.</p>';
+                document.getElementById('subscribersContainer').innerHTML = '<p class="text-center text-red-500 text-xs py-4">تعذر الاتصال بالسيرفر الخلفي (تأكد من تشغيل Node.js server.js).</p>';
             }
         }
 
-        // إظهار / إخفاء واجهة البحث عن اشتراك آخر
-        function toggleSearchBox() {
-            const searchBox = document.getElementById('searchBox');
-            searchBox.classList.toggle('hidden');
+        function switchTab(tab) {
+            currentTab = tab;
+            const tToday = document.getElementById('tabToday');
+            const tWeek = document.getElementById('tabWeek');
+
+            if (tab === 'today') {
+                tToday.classList.add('ring-4', 'ring-red-200');
+                tWeek.classList.remove('ring-4', 'ring-amber-200');
+                document.getElementById('listTitle').textContent = 'المشتركين الذين تنتهي اشتراكاتهم اليوم';
+            } else {
+                tWeek.classList.add('ring-4', 'ring-amber-200');
+                tToday.classList.remove('ring-4', 'ring-red-200');
+                document.getElementById('listTitle').textContent = 'المشتركين الذين تنتهي اشتراكاتهم خلال أسبوع';
+            }
+            renderList();
         }
 
-        // 2. الاستعلام بالاسم أو رقم الهاتف
-        async function searchSubscriber() {
-            const query = document.getElementById('searchInput').value.trim();
-            const resultsBox = document.getElementById('searchResults');
+        function renderList() {
+            const container = document.getElementById('subscribersContainer');
+            container.innerHTML = '';
 
-            if (!query) {
-                alert('يرجى كتابة الاسم أو رقم الهاتف للبحث.');
+            const list = globalData[currentTab] || [];
+
+            if (list.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">لا توجد اشتراكات في هذه الفئة حالياً ✓</p>';
                 return;
             }
 
-            resultsBox.classList.remove('hidden');
-            resultsBox.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">جاري البحث في قاعدة البيانات...</p>';
+            list.forEach(sub => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center';
+                
+                const defaultMsg = `مرحباً المشترك العزيز ${sub.fullName}، نود تذكيركم بأن اشتراككم في خدمة الفايبر (FTTH) سينتهي بتاريخ ${sub.expireDate}. يرجى التجديد استمراراً للخدمة.`;
+
+                card.innerHTML = `
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-sm">${sub.fullName}</h3>
+                        <p class="text-xs text-gray-500">الحساب: <span class="text-blue-600">${sub.username}</span> | الهاتف: ${sub.phone}</p>
+                        <p class="text-[11px] text-red-500 font-medium mt-1">تاريخ الانتهاء: ${sub.expireDate}</p>
+                    </div>
+                    <div>
+                        <button id="btn-${sub.id}" onclick="sendWhatsApp('${sub.phone}', \`${defaultMsg}\`, '${sub.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition flex items-center gap-1.5">
+                            إرسال واتساب 📤
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function sendWhatsApp(phone, message, id) {
+            if (!phone || phone === 'غير متوفر') {
+                alert('رقم هاتف المشترك غير متوفر أو غير صالح.');
+                return;
+            }
+
+            const btn = document.getElementById(`btn-${id}`);
+            btn.disabled = true;
+            btn.textContent = 'جاري الإرسال...';
+            btn.className = 'bg-gray-400 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-not-allowed';
 
             try {
-                // استعلام البحث بالمعلمة searchCriteria / query
-                const res = await fetch(`https://admin.ftth.iq/api/subscriptions?searchCriteria=${encodeURIComponent(query)}&partnerId=16909&pageSize=5&pageNumber=1`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Origin': 'https://admin.ftth.iq',
-                        'Referer': 'https://admin.ftth.iq/'
-                    }
+                const res = await fetch('http://localhost:3000/api/send-whatsapp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, message })
                 });
 
                 const data = await res.json();
-                const items = data.items || [];
-
-                if (items.length === 0) {
-                    resultsBox.innerHTML = '<p class="text-xs text-red-500 text-center py-2">لم يتم العثور على أي مشترك بهذه البيانات.</p>';
-                    return;
+                if (data.success) {
+                    btn.textContent = 'تم الإرسال ✓';
+                    btn.className = 'bg-emerald-100 text-emerald-700 px-4 py-2 rounded-xl text-xs font-bold';
+                } else {
+                    throw new Error(data.error);
                 }
-
-                resultsBox.innerHTML = '';
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs space-y-1';
-                    card.innerHTML = `
-                        <div class="flex justify-between font-bold text-gray-800">
-                            <span>${item.fullName || 'غير معنون'}</span>
-                            <span class="text-blue-600">${item.status || 'نشط'}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-500">
-                            <span>الهاتف: ${item.phoneNumber || 'غير مدخل'}</span>
-                            <span>الحساب: ${item.username || '-'}</span>
-                        </div>
-                    `;
-                    resultsBox.appendChild(card);
-                });
-
             } catch (err) {
-                resultsBox.innerHTML = '<p class="text-xs text-red-500 text-center py-2">حدث خطأ أثناء إجراء عملية البحث.</p>';
+                alert('فشل الإرسال: تأكد من ربط واتساب وتفعيل السيرفر.');
+                btn.disabled = false;
+                btn.textContent = 'إعادة المحاولة';
+                btn.className = 'bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold';
             }
         }
 
-        // تشغيل التعرف التلقائي فور فتح الصفحة
-        window.onload = detectCurrentSubscriber;
+        window.onload = loadData;
     </script>
 </body>
 </html>
